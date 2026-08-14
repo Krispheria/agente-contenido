@@ -1,0 +1,37 @@
+[
+  {
+    "fecha": "2026-05-12",
+    "red": "linkedin",
+    "tema": "Diferencia entre un chat y un agente",
+    "angulo": "El chat responde, el agente termina el trabajo",
+    "rendimiento": "el mejor del trimestre"
+  },
+  {
+    "fecha": "2026-06-03",
+    "red": "instagram",
+    "tema": "Diferencia entre un chat y un agente",
+    "angulo": "Tres cosas que un chat no puede hacer por ti",
+    "rendimiento": "normal"
+  },
+  {
+    "fecha": "2026-06-24",
+    "red": "linkedin",
+    "tema": "Coste de los agentes de IA",
+    "angulo": "Lo que de verdad cuesta una ejecucion, con la factura delante",
+    "rendimiento": "muchos comentarios preguntando por limites"
+  },
+  {
+    "fecha": "2026-07-08",
+    "red": "linkedin",
+    "tema": "Herramientas y permisos",
+    "angulo": "Tu agente no ejecuta nada: lo pide. Tu decides",
+    "rendimiento": "normal"
+  },
+  {
+    "fecha": "2026-07-29",
+    "red": "instagram",
+    "tema": "Montar algo propio sin ser programador",
+    "angulo": "Empieza por el problema mas aburrido que tengas",
+    "rendimiento": "flojo"
+  }
+]
