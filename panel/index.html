@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El agente, en vivo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23fff' stroke='%23d4d4d8'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%2310b981' stroke-width='3'/%3E%3C/svg%3E">
+<style>
+  /* Estetica de editor de nodos (React Flow / n8n): lienzo claro con
+     reticula de puntos, contenedores blancos de borde fino, texto negro,
+     y aristas con guiones que corren indicando la direccion.          */
+  :root {
+    --lienzo:    #ffffff;
+    --punto:     #e4e4e7;
+    --panel:     #fafafa;
+    --borde:     #e4e4e7;
+    --borde-mid: #d4d4d8;
+    --tinta:     #18181b;
+    --tinta-sec: #52525b;
+    --tinta-ter: #a1a1aa;
+    --acento:    #7c3aed;
+    --activo:    #f59e0b;
+    --activo-bg: #fffbeb;
+    --hecho:     #10b981;
+    --hecho-bg:  #ecfdf5;
+    --linea:     #b1b1b7;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--lienzo);
+    color: var(--tinta);
+    font: 15px/1.55 "Inter", "Segoe UI", system-ui, sans-serif;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 400px;
+  }
+  @media (max-width: 980px) { body { grid-template-columns: 1fr; height: auto; } }
+
+  /* ---------- el lienzo ---------- */
+  main { display: flex; flex-direction: column; min-width: 0; }
+  header { padding: 26px 34px 20px; border-bottom: 1px solid var(--borde); }
+  header h1 { margin: 0; font-size: 21px; font-weight: 650; letter-spacing: -0.02em; }
+  header p  { margin: 6px 0 0; color: var(--tinta-sec); font-size: 14px; max-width: 64ch; }
+  header code {
+    background: #f4f4f5; color: #3f3f46; border: 1px solid var(--borde);
+    padding: 1px 6px; border-radius: 5px;
+    font: 12.5px "Cascadia Mono", Consolas, monospace;
+  }
+
+  #diagrama {
+    flex: 1; display: grid; place-items: center;
+    /* La retícula de puntos: la firma visual de estos editores. */
+    background-color: var(--lienzo);
+    background-image: radial-gradient(circle, var(--punto) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+    padding: 40px 34px; min-height: 260px; overflow: auto;
+  }
+  /* Mermaid deja un `max-width` en linea que deja el diagrama diminuto.
+     Se lo quitamos en panel.js; aqui solo mandamos que ocupe el ancho. */
+  #diagrama svg { width: 100%; height: auto; max-height: 44vh; }
+  #diagrama .edgeLabel { display: none; }
+
+  /* Los contenedores llevan sombra de tarjeta, como en un editor de nodos. */
+  #diagrama g.node { filter: drop-shadow(0 1px 2px rgba(0,0,0,.07)) drop-shadow(0 3px 8px rgba(0,0,0,.05)); }
+
+  /* Guiones que corren: indican hacia donde va el flujo, siempre.
+     Es la `animated edge` de React Flow, con sus mismos valores.     */
+  #diagrama path.flowchart-link {
+    stroke-dasharray: 6 5;
+    animation: correr .6s linear infinite;
+  }
+  @keyframes correr { to { stroke-dashoffset: -11; } }
+
+  /* El nodo que se esta ejecutando ahora: pulso de anillo, no de tamaño.
+     Mermaid coloca cada nodo con un `transform`, asi que animar
+     `transform` lo manda a la esquina. */
+  .g-activo { animation: latido 1.4s ease-in-out infinite; }
+  @keyframes latido {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(245,158,11,.45)); }
+    50%      { filter: drop-shadow(0 0 12px rgba(245,158,11,.85)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #diagrama path.flowchart-link, .g-activo { animation: none; }
+  }
+
+  details {
+    border-top: 1px solid var(--borde); background: var(--panel);
+    padding: 14px 34px 20px;
+  }
+  details summary { cursor: pointer; color: var(--tinta-sec); font-size: 13px; user-select: none; }
+  details summary::marker { color: var(--acento); }
+  details pre {
+    margin: 12px 0 0; overflow-x: auto; color: var(--tinta-sec);
+    font: 12px/1.6 "Cascadia Mono", Consolas, monospace;
+  }
+
+  /* ---------- la barra lateral ---------- */
+  aside {
+    background: var(--panel); border-left: 1px solid var(--borde);
+    padding: 24px; display: flex; flex-direction: column; gap: 16px;
+    min-height: 100vh; max-height: 100vh; overflow: auto;
+  }
+  button {
+    background: var(--tinta); color: #fff; border: 0; border-radius: 8px;
+    padding: 13px 18px; font: 600 15px/1 "Inter", system-ui, sans-serif;
+    cursor: pointer;
+  }
+  button:hover { background: #27272a; }
+  button:disabled { background: var(--tinta-ter); cursor: default; }
+
+  .leyenda { display: flex; gap: 16px; font-size: 12px; color: var(--tinta-sec); }
+  .leyenda i {
+    width: 10px; height: 10px; border-radius: 3px; display: inline-block;
+    margin-right: 6px; border: 1px solid var(--borde-mid);
+  }
+
+  #pasos { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .paso {
+    border: 1px solid var(--borde); border-left: 3px solid var(--hecho);
+    border-radius: 10px; padding: 12px 14px; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    animation: entra .28s ease-out;
+  }
+  @keyframes entra { from { opacity: 0; transform: translateY(6px); } }
+  .paso b { color: var(--tinta); font: 600 13px/1 "Cascadia Mono", Consolas, monospace; }
+  /* Lo que costo ese paso. Va pegado al nombre del nodo, no en la factura:
+     asi se ve cual de los pasos es el que gasta.                          */
+  .gasto {
+    float: right; font: 600 12px/1.2 "Cascadia Mono", Consolas, monospace;
+    color: var(--acento); background: #f5f3ff;
+    border: 1px solid #ddd6fe; border-radius: 999px; padding: 2px 8px;
+  }
+  .gasto.cero { color: var(--tinta-ter); background: #fafafa; border-color: var(--borde); }
+  .paso dl { margin: 8px 0 0; font-size: 13px; }
+  .paso dt { color: var(--acento); font-family: "Cascadia Mono", Consolas, monospace; font-size: 12px; }
+  .paso dd { margin: 2px 0 8px; color: var(--tinta-sec); word-break: break-word; }
+  .paso dd:last-child { margin-bottom: 0; }
+  .paso.error { border-left-color: #dc2626; }
+  .paso.error b { color: #dc2626; }
+
+  #factura {
+    border-top: 1px solid var(--borde); padding-top: 16px;
+    font-size: 13px; color: var(--tinta-sec); min-height: 30px;
+  }
+  #factura strong { display: block; color: var(--tinta); font-size: 26px; letter-spacing: -0.02em; }
+  #factura em { color: var(--acento); font-style: normal; }
+</style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>El agente de contenido, en vivo</h1>
+      <p>
+        Coge el encargo del mes, saca de él los temas y el tono, y escribe una pieza.
+        Tres pasos. Cada uno se enciende <strong>cuando termina de verdad</strong>, no al final:
+        lo que ves es <code>stream(stream_mode="updates")</code>.
+      </p>
+    </header>
+
+    <div id="diagrama">Cargando el grafo…</div>
+
+    <details>
+      <summary>El texto que generó tu propio grafo (esto es lo que imprime <code>01_dibujar.py</code>)</summary>
+      <pre id="fuente"></pre>
+    </details>
+  </main>
+
+  <aside>
+    <button id="ejecutar">Ejecutar el agente</button>
+    <div class="leyenda">
+      <span><i style="background:#fff"></i>sin pasar</span>
+      <span><i style="background:#fffbeb;border-color:#f59e0b"></i>ejecutando</span>
+      <span><i style="background:#ecfdf5;border-color:#10b981"></i>hecho</span>
+    </div>
+    <div id="pasos"></div>
+    <div id="factura"></div>
+  </aside>
+
+  <script src="/mermaid.js"></script>
+  <script src="/panel.js"></script>
+</body>
+</html>

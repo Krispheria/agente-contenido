@@ -1,0 +1,11 @@
+# La clave real. Al repositorio va solo .env.example
+.env
+
+# Entorno y cache que crea uv
+.venv/
+__pycache__/
+*.pyc
+
+# Estado guardado del agente (aparece en la parte 5)
+*.sqlite
+*.sqlite3
