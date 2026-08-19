@@ -7,7 +7,8 @@ y devuelve **solo los campos que cambia**, no el estado entero.
 apareciendo segun los nodos los rellenan.
 """
 
-from typing import TypedDict
+from operator import add
+from typing import Annotated, TypedDict
 
 
 class Estado(TypedDict, total=False):
@@ -27,3 +28,9 @@ class Estado(TypedDict, total=False):
     """Que pide el mensaje del cliente: pieza nueva, correccion o ninguna.
 
     Lo rellena el clasificador y lo lee la arista condicional para elegir rama."""
+
+    borradores: Annotated[list[str], add]
+    """Las versiones que devuelven las ramas del abanico.
+
+    Lleva reducer porque tres nodos escriben esta clave a la vez: `add` las
+    acumula en una lista en vez de pisarse. Sin el, seria un conflicto."""

@@ -27,6 +27,35 @@ def elegir_rama(estado: Estado) -> str:
     return estado["tipo"]
 
 
+def _version(estado: Estado, red: str) -> Estado:
+    """Redacta una version y la deja en la lista comun.
+
+    Las tres ramas devuelven la misma clave, `borradores`; el reducer del
+    estado es quien las junta sin que se pisen.
+    """
+    return {"borradores": [f"{red}\n{redactar(estado)['pieza']}"]}
+
+
+def redactar_linkedin(estado: Estado) -> Estado:
+    """La version de LinkedIn."""
+    return _version(estado, "LinkedIn")
+
+
+def redactar_instagram(estado: Estado) -> Estado:
+    """La version de Instagram."""
+    return _version(estado, "Instagram")
+
+
+def redactar_x(estado: Estado) -> Estado:
+    """La version de X."""
+    return _version(estado, "X")
+
+
+def reunir(_: Estado) -> Estado:
+    """El punto donde las tres ramas ya han terminado."""
+    return {}
+
+
 def corregir(estado: Estado) -> Estado:
     """Reescribe una pieza que ya existe, en vez de empezar una nueva."""
     return redactar(estado)
@@ -43,6 +72,10 @@ def construir():
     grafo.add_node("clasificar", clasificar)
     grafo.add_node("redactar", redactar)
     grafo.add_node("corregir", corregir)
+    grafo.add_node("redactar_linkedin", redactar_linkedin)
+    grafo.add_node("redactar_instagram", redactar_instagram)
+    grafo.add_node("redactar_x", redactar_x)
+    grafo.add_node("reunir", reunir)
 
     # Hasta clasificar, el orden es el mismo de siempre.
     grafo.add_edge(START, "leer_encargo")
@@ -62,7 +95,19 @@ def construir():
         },
     )
 
-    grafo.add_edge("redactar", END)
+    # Parte 5: redactar deja de ser un solo paso y se abre en tres. Las tres
+    # salen del mismo nodo, asi que LangGraph las ejecuta en el mismo
+    # super-step; al volver, todas escriben en `borradores` y el reducer las
+    # junta. Se ve en el panel porque un evento trae los tres nodos a la vez.
+    grafo.add_edge("redactar", "redactar_linkedin")
+    grafo.add_edge("redactar", "redactar_instagram")
+    grafo.add_edge("redactar", "redactar_x")
+    grafo.add_edge(
+        ["redactar_linkedin", "redactar_instagram", "redactar_x"],
+        "reunir",
+    )
+
+    grafo.add_edge("reunir", END)
     grafo.add_edge("corregir", END)
 
     return grafo.compile()
