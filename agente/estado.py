@@ -22,3 +22,8 @@ class Estado(TypedDict, total=False):
 
     pieza: str
     """El texto redactado. Es la salida del agente."""
+
+    tipo: str
+    """Que pide el mensaje del cliente: pieza nueva, correccion o ninguna.
+
+    Lo rellena el clasificador y lo lee la arista condicional para elegir rama."""

@@ -1,0 +1,18 @@
+[
+  {
+    "caso": "pieza_nueva",
+    "mensaje": "Hola, para septiembre necesitamos una pieza nueva en LinkedIn sobre cómo calcular el coste de un agente. Que sea directa y sin promesas de ahorro mágico."
+  },
+  {
+    "caso": "correccion",
+    "mensaje": "Buenas, he revisado el post que nos pasasteis sobre chats y agentes. Cambiad el arranque: ahora mismo suena demasiado comercial y necesitamos que vaya más al grano."
+  },
+  {
+    "caso": "no_encargo",
+    "mensaje": "Hola, ¿podéis confirmarme si la reunión de seguimiento del jueves sigue siendo a las diez?"
+  },
+  {
+    "caso": "ambiguo",
+    "mensaje": "Oye, con lo del lanzamiento, ¿llegamos a meterlo este mes o mejor lo dejamos como estaba?"
+  }
+]
