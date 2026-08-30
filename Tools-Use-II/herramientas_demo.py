@@ -3,7 +3,7 @@
 La pareja esta elegida para que la eleccion se vea de lejos: una vive en tu
 codigo y la otra sale a internet, y sus dominios no se pisan. El modelo no
 sabe cual es cual — ve dos fichas (nombre, docstring, tipos) y elige por lo
-que dicen, igual que en `herramientas.py`.
+que dicen, igual que en `agente/herramientas.py`.
 """
 
 import json

@@ -1,15 +1,23 @@
-"""Tools 2 — Dos herramientas, y el agente elige la que toca.
+"""Tools Use II — Dos herramientas, y el agente elige la que toca.
 
-    uv run 06_dos_tools.py                                   pregunta de red    -> tool interna
-    uv run 06_dos_tools.py "Dame contexto sobre <un tema>"   documentarse       -> Wikipedia
+Se ejecuta desde la raiz del proyecto:
 
-Una herramienta es codigo tuyo (un diccionario en `agente/herramientas_demo.py`);
-la otra sale a internet (la API publica de Wikipedia, sin key). El agente no
-distingue "interna" de "externa": ve dos fichas —nombre, docstring, tipos— y
-elige por lo que dicen. Cambia la pregunta y cambia la mano que levanta.
+    uv run Tools-Use-II/06_dos_tools.py                                   pregunta de red -> tool interna
+    uv run Tools-Use-II/06_dos_tools.py "Dame contexto sobre <un tema>"   documentarse    -> Wikipedia
+
+Una herramienta es codigo tuyo (un diccionario en `herramientas_demo.py`, en
+esta misma carpeta); la otra sale a internet (la API publica de Wikipedia, sin
+key). El agente no distingue "interna" de "externa": ve dos fichas —nombre,
+docstring, tipos— y elige por lo que dicen. Cambia la pregunta y cambia la
+mano que levanta.
 """
 
 import sys
+from pathlib import Path
+
+# Este script vive en su carpeta de clase; el paquete `agente` esta un nivel
+# arriba. Esta linea le ensena a Python donde buscarlo.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from langchain.agents import create_agent
 from langchain_core.callbacks import get_usage_metadata_callback
@@ -17,7 +25,7 @@ from langchain_core.messages import ToolMessage
 from langchain_openai import ChatOpenAI
 from rich.console import Console
 
-from agente.herramientas_demo import DEMO
+from herramientas_demo import DEMO
 from agente.nodos import MODELO_MECANICO
 from agente.precios import FECHA_PRECIOS, coste
 

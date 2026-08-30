@@ -1,7 +1,9 @@
-"""Tools 2 — El mismo agente de `06_dos_tools.py`, dentro del panel.
+"""Tools Use II — El mismo agente de `06_dos_tools.py`, dentro del panel.
 
-    uv run 07_panel_tools.py
-    uv run 07_panel_tools.py "Dame contexto sobre los agentes de IA"
+Se ejecuta desde la raiz del proyecto:
+
+    uv run Tools-Use-II/07_panel_tools.py
+    uv run Tools-Use-II/07_panel_tools.py "Dame contexto sobre los agentes de IA"
 
 El panel es el de la parte 2 y no se toca: pinta el grafo que le sirvan y
 enciende los nodos segun llegan los pasos. El grafo real de `create_agent`
@@ -20,17 +22,22 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+# Este script vive en su carpeta de clase; el paquete `agente` y la carpeta
+# `panel/` estan un nivel arriba.
+RAIZ = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(RAIZ))
+
 from langchain.agents import create_agent
 from langchain_core.callbacks import get_usage_metadata_callback
 from langchain_openai import ChatOpenAI
 
-from agente.herramientas_demo import DEMO
+from herramientas_demo import DEMO
 from agente.nodos import MODELO_MECANICO
 from agente.precios import FECHA_PRECIOS, coste
 
 # Puerto propio: puede convivir con el panel de la cadena (4571).
 PUERTO = 4572
-PANEL = Path(__file__).resolve().parent / "panel"
+PANEL = RAIZ / "panel"
 
 PREGUNTA_DEFECTO = "Voy a publicar en Instagram. Cuantos caracteres tengo?"
 PREGUNTA = " ".join(sys.argv[1:]).strip() or PREGUNTA_DEFECTO
